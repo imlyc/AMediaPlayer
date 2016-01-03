@@ -14,6 +14,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
+import android.widget.MediaController;
 
 public class MainActivity extends AppCompatActivity {
     private final static String TAG = "MainActivity";
@@ -39,6 +41,14 @@ public class MainActivity extends AppCompatActivity {
             }
 
             mService = (MediaService.Controller) service;
+
+            FrameLayout controllerContainer = findViewInContent(R.id.media_controller);
+            MediaController controller = new MediaController(MainActivity.this, true);
+            controller.setMediaPlayer(mService);
+            controller.setAnchorView(controllerContainer);
+
+            controller.show(0);
+
         }
 
         @Override
@@ -93,6 +103,12 @@ public class MainActivity extends AppCompatActivity {
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(mFloatingActionButtonAction);
+
+        // MediaController
+        FrameLayout controllerContainer = findViewInContent(R.id.media_controller);
+        MediaController controller = new MediaController(this, true);
+
+
     }
 
     @Override
