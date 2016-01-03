@@ -20,16 +20,16 @@
         android:layout_weight="2"
         android:elevation="@dimen/view_elevation"
         android:orientation="horizontal"
-        android:background="#123456">
+        android:background="@color/dark_black">
 
     </LinearLayout>
 
     <ListView
-        android:id="@+id/media_list"
+        android:id="@+id/songs_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="4"
-        android:background="#654321">
+        android:background="@color/dark_red">
     </ListView>
 
     <com.ac0deape.amediaplayer.view.CustomMediaController
@@ -39,6 +39,6 @@
         android:layout_weight="1"
         android:elevation="@dimen/view_elevation"
         android:orientation="vertical"
-        android:background="#ffaabb">
+        android:background="@color/pink">
     </com.ac0deape.amediaplayer.view.CustomMediaController>
 </LinearLayout>

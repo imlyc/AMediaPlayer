@@ -11,13 +11,11 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.AdapterView;
-import android.widget.FrameLayout;
 import android.widget.ListView;
-import android.widget.MediaController;
 
 import com.ac0deape.amediaplayer.base.MediaInfo;
 import com.ac0deape.amediaplayer.view.CustomMediaController;
@@ -29,9 +27,12 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
     private final static String TAG = "MainActivity";
+
     private MediaService.Player mService = null;
+
     private ArrayList<MediaInfo> mMediaInfos = new ArrayList<>();
     private MediaListAdapter mAdapter;
+
     private Timer mTimer = null;
     private CustomMediaController mMediaController;
 
@@ -111,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
     private MediaService.StateListener mPlayerStateListener = new MediaService.StateListener() {
         @Override
         public void onPrepared() {
-            // start updating progress bar
+            // update progress bar in Media Controller every 1000 ms(1s).
             mTimer = new Timer();
             mTimer.schedule(new TimerTask() {
                 @Override
@@ -130,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onComplete() {
+            //cancel timer
             if (mTimer != null) {
                 mTimer.cancel();
                 mTimer = null;
