@@ -23,60 +23,26 @@ public class MediaService extends Service {
         public void onComplete();
     }
 
-    public class Player extends Binder {
-
-
-        public void setPlaylist(ArrayList<MediaInfo> infos) {
-            MediaService.this.setPlaylist(infos);
-        }
-
-        public void playMediaAtPosition(int position) {
-            MediaService.this.playMediaAt(position);
-        }
-
-        public int getProgress() {
-            return MediaService.this.getProgress();
-        }
-
-        public void pause() {
-            MediaService.this.pause();
-        }
-
-        public void resume() {
-            MediaService.this.resume();
-        }
-
-        public void playPrevious() {
-            MediaService.this.playPrevious();
-        }
-
-        public void playNext() {
-            MediaService.this.playNext();
-        }
-
-        public void addStateListener(StateListener listener) {
-            MediaService.this.addStateListener(listener);
-        }
-
-        public void removeStateListener(StateListener listener) {
-            MediaService.this.addStateListener(listener);
+    public class MediaBinder extends Binder {
+        public MediaService getMediaService() {
+            return MediaService.this;
         }
     }
 
     private final static String TAG = "MediaService";
-    private Player mBinder = new Player();
+    private MediaBinder mBinder = new MediaBinder();
     private ArrayList<MediaInfo> mPlaylist = null;
 
     private MediaPlayer mMediaPlayer = null;
     private int mCurPlayingIndex = -1;
 
-    private ArrayList<StateListener> mStateListeners = new ArrayList<>();
+    private StateListener mStateListener = null;
 
     private MediaPlayer.OnPreparedListener mMPPreparedListener = new MediaPlayer.OnPreparedListener() {
         @Override
         public void onPrepared(MediaPlayer mp) {
-            for (StateListener l : mStateListeners) {
-                l.onPrepared();
+            if (mStateListener != null) {
+                mStateListener.onPrepared();
             }
 
             mMediaPlayer.start();
@@ -86,10 +52,12 @@ public class MediaService extends Service {
     private MediaPlayer.OnCompletionListener mMPCompleteionListener = new MediaPlayer.OnCompletionListener() {
         @Override
         public void onCompletion(MediaPlayer mp) {
-            for (StateListener l : mStateListeners) {
-                l.onComplete();
+            if (mStateListener != null) {
+                mStateListener.onComplete();
             }
-            playNext();
+
+            // Temporary disable play next song.
+            // playNext();
         }
     };
 
@@ -129,11 +97,11 @@ public class MediaService extends Service {
         Log.d(TAG, "onDestroy");
     }
 
-    private void setPlaylist(ArrayList<MediaInfo> infos) {
+    public void setPlaylist(ArrayList<MediaInfo> infos) {
         mPlaylist = infos;
     }
 
-    private void playMediaAt(int index) {
+    public void playMediaAt(int index) {
         Log.d(TAG, "playMediaAt " + index);
         if (mMediaPlayer != null) {
             mMediaPlayer.reset();
@@ -149,7 +117,7 @@ public class MediaService extends Service {
 
     }
 
-    private void playNext() {
+    public void playNext() {
         if (mCurPlayingIndex == mPlaylist.size() - 1) {
             playMediaAt(0);
         } else {
@@ -157,7 +125,7 @@ public class MediaService extends Service {
         }
     }
 
-    private void playPrevious() {
+    public void playPrevious() {
         if (mCurPlayingIndex == 0) {
             playMediaAt(mPlaylist.size() - 1);
         } else {
@@ -186,7 +154,7 @@ public class MediaService extends Service {
         mediaPlayer.setLooping(false);
     }
 
-    private int getProgress() {
+    public int getProgress() {
         if (mMediaPlayer == null) {
             return 0;
         } else {
@@ -197,25 +165,19 @@ public class MediaService extends Service {
         }
     }
 
-    private void pause() {
+    public void pause() {
         if (mMediaPlayer != null) {
             mMediaPlayer.pause();
         }
     }
 
-    private void resume() {
+    public void resume() {
         if (mMediaPlayer != null) {
             mMediaPlayer.start();
         }
     }
 
-    private void addStateListener(StateListener l) {
-        if (!mStateListeners.contains(l)) {
-            mStateListeners.add(l);
-        }
-    }
-
-    private void removeStateListener(StateListener l) {
-        mStateListeners.remove(l);
+    public void setStateListener(StateListener l) {
+        mStateListener = l;
     }
 }

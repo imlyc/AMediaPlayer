@@ -28,7 +28,7 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity {
     private final static String TAG = "MainActivity";
 
-    private MediaService.Player mService = null;
+    private MediaService mService = null;
 
     private ArrayList<MediaInfo> mMediaInfos = new ArrayList<>();
     private MediaListAdapter mAdapter;
@@ -55,9 +55,9 @@ public class MainActivity extends AppCompatActivity {
                 Log.w(TAG, "service already bound " + mService);
             }
 
-            mService = (MediaService.Player) service;
+            mService = ((MediaService.MediaBinder) service).getMediaService();
             mService.setPlaylist(mMediaInfos);
-            mService.addStateListener(mPlayerStateListener);
+            mService.setStateListener(mPlayerStateListener);
         }
 
         @Override
@@ -105,37 +105,20 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             Log.d(TAG, "onItemClick at " + position);
-            mService.playMediaAtPosition(position);
+            mService.playMediaAt(position);
         }
     };
 
     private MediaService.StateListener mPlayerStateListener = new MediaService.StateListener() {
         @Override
         public void onPrepared() {
-            // update progress bar in Media Controller every 1000 ms(1s).
-            mTimer = new Timer();
-            mTimer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            int progress = mService.getProgress();
-                            mMediaController.updateSeekBar(progress);
-                            //Log.d(TAG, "progress " + progress);
-                        }
-                    });
-                }
-            }, 0, 1000);
+            startUpdateSeekBar();
         }
 
         @Override
         public void onComplete() {
             //cancel timer
-            if (mTimer != null) {
-                mTimer.cancel();
-                mTimer = null;
-            }
+            stopUpdateSeekBar();
         }
     };
 
@@ -163,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        stopUpdateSeekBar();
         Log.d(TAG, "onStop");
     }
 
@@ -174,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void cleanMediaService() {
         if (mService != null) {
-            mService.removeStateListener(mPlayerStateListener);
+            mService.setStateListener(null);
             unbindService(mServiceConnection);
         }
     }
@@ -190,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
         mMediaController.setEventListener(mMediaEventListener);
 
 
-        ListView mediaList = findViewInContent(R.id.media_list);
+        ListView mediaList = findViewInContent(R.id.songs_list);
         mMediaInfos.add(new MediaInfo());
         mMediaInfos.add(new MediaInfo());
         mMediaInfos.add(new MediaInfo());
@@ -226,5 +210,30 @@ public class MainActivity extends AppCompatActivity {
         View content = findViewById(R.id.layout_content);
         V v = (V) content.findViewById(viewId);
         return v;
+    }
+
+    private void startUpdateSeekBar() {
+        // update progress bar in Media Controller every 1000 ms(1s).
+        mTimer = new Timer();
+        mTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        int progress = mService.getProgress();
+                        mMediaController.updateSeekBar(progress);
+                        //Log.d(TAG, "progress " + progress);
+                    }
+                });
+            }
+        }, 0, 1000);
+    }
+
+    private void stopUpdateSeekBar() {
+        if (mTimer != null) {
+            mTimer.cancel();
+            mTimer = null;
+        }
     }
 }
