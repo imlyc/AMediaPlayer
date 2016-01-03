@@ -19,8 +19,10 @@ import java.util.ArrayList;
 public class MediaService extends Service {
 
     public interface StateListener {
-        public void onPrepared();
-        public void onComplete();
+        void onPrepared();
+        void onComplete();
+        void onStopped();
+        void onError();
     }
 
     public class MediaBinder extends Binder {
@@ -45,7 +47,7 @@ public class MediaService extends Service {
                 mStateListener.onPrepared();
             }
 
-            mMediaPlayer.start();
+            mp.start();
         }
     };
 
@@ -65,6 +67,9 @@ public class MediaService extends Service {
         @Override
         public boolean onError(MediaPlayer mp, int what, int extra) {
             Log.d(TAG, "media player error happens");
+            if (mStateListener != null) {
+                mStateListener.onError();
+            }
             return false;
 
         }
@@ -104,10 +109,16 @@ public class MediaService extends Service {
     public void playMediaAt(int index) {
         Log.d(TAG, "playMediaAt " + index);
         if (mMediaPlayer != null) {
-            mMediaPlayer.reset();
-        } else {
-            mMediaPlayer = new MediaPlayer();
+            if (mMediaPlayer.isPlaying()) {
+                mMediaPlayer.stop();
+                if (mStateListener != null) {
+                    mStateListener.onStopped();
+                }
+            }
+            mMediaPlayer.release();
         }
+
+        mMediaPlayer = new MediaPlayer();
         mCurPlayingIndex = index;
 
         initMediaPlayer(mMediaPlayer);
@@ -135,9 +146,8 @@ public class MediaService extends Service {
 
     private void prepareMediaPlayer(MediaPlayer mediaPlayer, MediaInfo info) {
 
-        String url = "http://www.stephaniequinn.com/Music/Mozart%20-%20Presto.mp3";
         try {
-            mediaPlayer.setDataSource(url);
+            mediaPlayer.setDataSource(getApplicationContext(), info.getUri());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -146,6 +156,7 @@ public class MediaService extends Service {
     }
 
     private void initMediaPlayer(MediaPlayer mediaPlayer) {
+        // Listeners
         mediaPlayer.setOnPreparedListener(mMPPreparedListener);
         mediaPlayer.setOnCompletionListener(mMPCompleteionListener);
         mediaPlayer.setOnErrorListener(mMPErrorListener);
@@ -160,7 +171,7 @@ public class MediaService extends Service {
         } else {
             int duration = mMediaPlayer.getDuration();
             int current = mMediaPlayer.getCurrentPosition();
-            //Log.d(TAG, "duration " + duration + ", current " + current);
+            Log.d(TAG, "duration " + duration + ", current " + current);
             return current * 100 / duration;
         }
     }

@@ -36,6 +36,7 @@ public class MediaListAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         TextView tv =new TextView(parent.getContext());
         tv.setText(mMediaInfos.get(position).getTitle());
+        tv.setTextSize(20);
 
         return tv;
     }
