@@ -201,9 +201,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         ListView mediaList = findViewInContent(R.id.songs_list);
-        mMediaInfos.add(new MediaInfo());
-        mMediaInfos.add(new MediaInfo());
-        mMediaInfos.add(new MediaInfo());
+        mMediaInfos.add(MediaInfo.createTest());
+        mMediaInfos.add(MediaInfo.createTest());
+        mMediaInfos.add(MediaInfo.createTest());
 
         mAdapter = new MediaListAdapter(mMediaInfos);
         mediaList.setAdapter(mAdapter);
