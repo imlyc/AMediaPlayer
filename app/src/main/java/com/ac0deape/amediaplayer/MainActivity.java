@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
@@ -27,6 +28,7 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
     private final static String TAG = "MainActivity";
+    private final static int REQ_CODE_PICK_MUSIC = 10;
 
     private MediaService mService = null;
 
@@ -40,8 +42,12 @@ public class MainActivity extends AppCompatActivity {
     private View.OnClickListener mFloatingActionButtonAction = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
+            //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+            //        .setAction("Action", null).show();
+            Intent intentPick =
+                    new Intent(Intent.ACTION_PICK,
+                               android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI);
+            startActivityForResult(intentPick, REQ_CODE_PICK_MUSIC);
         }
     };
 
@@ -112,13 +118,22 @@ public class MainActivity extends AppCompatActivity {
     private MediaService.StateListener mPlayerStateListener = new MediaService.StateListener() {
         @Override
         public void onPrepared() {
-            startUpdateSeekBar();
+            updateMediaControllerState(true);
         }
 
         @Override
         public void onComplete() {
-            //cancel timer
-            stopUpdateSeekBar();
+            updateMediaControllerState(false);
+        }
+
+        @Override
+        public void onStopped() {
+            updateMediaControllerState(false);
+        }
+
+        @Override
+        public void onError() {
+            updateMediaControllerState(false);
         }
     };
 
@@ -148,6 +163,17 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         stopUpdateSeekBar();
         Log.d(TAG, "onStop");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK && requestCode == REQ_CODE_PICK_MUSIC) {
+            Uri selected = data.getData();
+            Log.d(TAG, "select " + selected);
+            MediaInfo info = MediaInfo.createLocal(selected);
+            mMediaInfos.add(info);
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
 
@@ -210,6 +236,15 @@ public class MainActivity extends AppCompatActivity {
         View content = findViewById(R.id.layout_content);
         V v = (V) content.findViewById(viewId);
         return v;
+    }
+
+    private void updateMediaControllerState(boolean isPlaying) {
+        mMediaController.updateButtonState(isPlaying);
+        if (isPlaying) {
+            startUpdateSeekBar();
+        } else {
+            stopUpdateSeekBar();
+        }
     }
 
     private void startUpdateSeekBar() {

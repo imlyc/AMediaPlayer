@@ -96,16 +96,14 @@ public class CustomMediaController extends LinearLayout {
                     if (mListener != null) {
                         mListener.onPause();
                     }
-                    mButtonPlayPause.setImageResource(android.R.drawable.ic_media_play);
                 } else {
                     if (mListener != null) {
                         mListener.onResume();
                     }
-                    mButtonPlayPause.setImageResource(android.R.drawable.ic_media_pause);
                 }
 
                 // Toggle state: playing -> not playing, not playing -> playing
-                mButtonPlayPause.setTag(!playing);
+                updateButtonState(!playing);
             }
         });
 
@@ -140,5 +138,14 @@ public class CustomMediaController extends LinearLayout {
             int p = mSeekBar.getProgress();
             mSeekBar.setProgress(p + 1);
         }
+    }
+
+    public void updateButtonState(boolean isPlaying) {
+        if (isPlaying) {
+            mButtonPlayPause.setImageResource(android.R.drawable.ic_media_pause);
+        } else {
+            mButtonPlayPause.setImageResource(android.R.drawable.ic_media_play);
+        }
+        mButtonPlayPause.setTag(isPlaying);
     }
 }
