@@ -1,7 +1,6 @@
 package com.ac0deape.amediaplayer.view;
 
 import android.content.Context;
-import android.media.Image;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +14,7 @@ import com.ac0deape.amediaplayer.R;
  * Created by imlyc on 1/3/16.
  */
 public class CustomMediaController extends LinearLayout {
+
     public interface MediaEventListener {
         public void onResume();
         public void onPause();
@@ -30,13 +30,14 @@ public class CustomMediaController extends LinearLayout {
     private ImageButton mButtonPlayPause;
     private ImageButton mButtonRewind;
     private ImageButton mButtonFastForward;
+
     private MediaEventListener mListener = null;
+
 
     public CustomMediaController(Context context) {
         super(context);
         init(context);
     }
-
 
     public CustomMediaController(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -55,10 +56,11 @@ public class CustomMediaController extends LinearLayout {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.media_controller, this, true);
 
+        // progress seekBar
         mSeekBar = (SeekBar) findViewById(R.id.media_controller_seekbar);
         mSeekBar.setEnabled(false);
 
-        // controls
+        // function controls
         mButtonPrevious = (ImageButton) findViewById(R.id.media_controller_previous);
         mButtonNext = (ImageButton) findViewById(R.id.media_controller_next);
         mButtonRewind = (ImageButton) findViewById(R.id.media_controller_rewind);
@@ -102,7 +104,7 @@ public class CustomMediaController extends LinearLayout {
                     mButtonPlayPause.setImageResource(android.R.drawable.ic_media_pause);
                 }
 
-                // Toggle state
+                // Toggle state: playing -> not playing, not playing -> playing
                 mButtonPlayPause.setTag(!playing);
             }
         });
@@ -126,6 +128,7 @@ public class CustomMediaController extends LinearLayout {
         });
     }
 
+    // progress%
     public void updateSeekBar(int progress) {
         if (!mSeekBar.isEnabled()) {
             mSeekBar.setEnabled(true);
@@ -137,6 +140,5 @@ public class CustomMediaController extends LinearLayout {
             int p = mSeekBar.getProgress();
             mSeekBar.setProgress(p + 1);
         }
-
     }
 }

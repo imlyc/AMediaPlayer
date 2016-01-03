@@ -6,25 +6,18 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
-import android.os.IInterface;
-import android.os.Parcel;
-import android.os.RemoteException;
-import android.provider.MediaStore;
-import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.MediaController;
 
 import com.ac0deape.amediaplayer.base.MediaInfo;
 
-import java.io.FileDescriptor;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
  * Created by imlyc on 1/2/16.
  */
 public class MediaService extends Service {
+
     public interface StateListener {
         public void onPrepared();
         public void onComplete();
@@ -32,12 +25,15 @@ public class MediaService extends Service {
 
     public class Player extends Binder {
 
+
         public void setPlaylist(ArrayList<MediaInfo> infos) {
             MediaService.this.setPlaylist(infos);
         }
+
         public void playMediaAtPosition(int position) {
             MediaService.this.playMediaAt(position);
         }
+
         public int getProgress() {
             return MediaService.this.getProgress();
         }
