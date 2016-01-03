@@ -18,6 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2"
+        android:elevation="@dimen/view_elevation"
         android:orientation="horizontal"
         android:background="#123456">
 
@@ -31,10 +32,13 @@
         android:background="#654321">
     </ListView>
 
-    <FrameLayout
+    <com.ac0deape.amediaplayer.view.CustomMediaController
         android:id="@+id/media_controller"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
-    </FrameLayout>
+        android:layout_weight="1"
+        android:elevation="@dimen/view_elevation"
+        android:orientation="vertical"
+        android:background="#ffaabb">
+    </com.ac0deape.amediaplayer.view.CustomMediaController>
 </LinearLayout>

@@ -14,12 +14,26 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
+import android.widget.ListView;
 import android.widget.MediaController;
+
+import com.ac0deape.amediaplayer.base.MediaInfo;
+import com.ac0deape.amediaplayer.view.CustomMediaController;
+import com.ac0deape.amediaplayer.view.MediaListAdapter;
+
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
     private final static String TAG = "MainActivity";
-    private MediaService.Controller mService = null;
+    private MediaService.Player mService = null;
+    private ArrayList<MediaInfo> mMediaInfos = new ArrayList<>();
+    private MediaListAdapter mAdapter;
+    private Timer mTimer = null;
+    private CustomMediaController mMediaController;
 
     // floating action button
     private View.OnClickListener mFloatingActionButtonAction = new View.OnClickListener() {
@@ -40,21 +54,86 @@ public class MainActivity extends AppCompatActivity {
                 Log.w(TAG, "service already bound " + mService);
             }
 
-            mService = (MediaService.Controller) service;
-
-            FrameLayout controllerContainer = findViewInContent(R.id.media_controller);
-            MediaController controller = new MediaController(MainActivity.this, true);
-            controller.setMediaPlayer(mService);
-            controller.setAnchorView(controllerContainer);
-
-            controller.show(0);
-
+            mService = (MediaService.Player) service;
+            mService.setPlaylist(mMediaInfos);
+            mService.addStateListener(mPlayerStateListener);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.d(TAG, "disconnect " + name);
             mService = null;
+        }
+    };
+
+    private CustomMediaController.MediaEventListener mMediaEventListener = new CustomMediaController.MediaEventListener() {
+        @Override
+        public void onResume() {
+            mService.resume();
+        }
+
+        @Override
+        public void onPause() {
+            mService.pause();
+
+        }
+
+        @Override
+        public void onPrevious() {
+            mService.playPrevious();
+        }
+
+        @Override
+        public void onNext() {
+            mService.playNext();
+        }
+
+        @Override
+        public void onRewind() {
+
+        }
+
+        @Override
+        public void onFastForward() {
+
+        }
+    };
+
+    private ListView.OnItemClickListener mItemClickListener = new ListView.OnItemClickListener() {
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            Log.d(TAG, "onItemClick at " + position);
+            mService.playMediaAtPosition(position);
+        }
+    };
+
+    private MediaService.StateListener mPlayerStateListener = new MediaService.StateListener() {
+        @Override
+        public void onPrepared() {
+            // start updating progress bar
+            mTimer = new Timer();
+            mTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            int progress = mService.getProgress();
+                            mMediaController.updateSeekBar(progress);
+                            //Log.d(TAG, "progress " + progress);
+                        }
+                    });
+                }
+            }, 0, 1000);
+        }
+
+        @Override
+        public void onComplete() {
+            if (mTimer != null) {
+                mTimer.cancel();
+                mTimer = null;
+            }
         }
     };
 
@@ -93,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void cleanMediaService() {
         if (mService != null) {
+            mService.removeStateListener(mPlayerStateListener);
             unbindService(mServiceConnection);
         }
     }
@@ -104,11 +184,18 @@ public class MainActivity extends AppCompatActivity {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(mFloatingActionButtonAction);
 
-        // MediaController
-        FrameLayout controllerContainer = findViewInContent(R.id.media_controller);
-        MediaController controller = new MediaController(this, true);
+        mMediaController = findViewInContent(R.id.media_controller);
+        mMediaController.setEventListener(mMediaEventListener);
 
 
+        ListView mediaList = findViewInContent(R.id.media_list);
+        mMediaInfos.add(new MediaInfo());
+        mMediaInfos.add(new MediaInfo());
+        mMediaInfos.add(new MediaInfo());
+
+        mAdapter = new MediaListAdapter(mMediaInfos);
+        mediaList.setAdapter(mAdapter);
+        mediaList.setOnItemClickListener(mItemClickListener);
     }
 
     @Override
