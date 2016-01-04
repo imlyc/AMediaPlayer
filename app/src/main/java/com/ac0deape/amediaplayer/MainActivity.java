@@ -104,6 +104,13 @@ public class MainActivity extends AppCompatActivity {
         public void onFastForward() {
 
         }
+
+        @Override
+        public void onSeek(int progress) {
+
+            mService.seek(progress);
+
+        }
     };
 
     private ListView.OnItemClickListener mItemClickListener = new ListView.OnItemClickListener() {
@@ -155,13 +162,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        if (mService != null && mService.isPlaying()) {
+            startUpdateSeekBar();
+        }
         Log.d(TAG, "onStart");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        stopUpdateSeekBar();
+        if (mService != null && mService.isPlaying()) {
+            stopUpdateSeekBar();
+        }
         Log.d(TAG, "onStop");
     }
 

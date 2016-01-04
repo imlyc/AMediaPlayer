@@ -18,6 +18,8 @@ import java.util.ArrayList;
  */
 public class MediaService extends Service {
 
+
+
     public interface StateListener {
         void onPrepared();
         void onComplete();
@@ -190,5 +192,16 @@ public class MediaService extends Service {
 
     public void setStateListener(StateListener l) {
         mStateListener = l;
+    }
+
+    public boolean isPlaying() {
+        return mMediaPlayer != null && mMediaPlayer.isPlaying();
+    }
+
+    public void seek(int progress) {
+        if (mMediaPlayer != null) {
+            int duration = mMediaPlayer.getDuration();
+            mMediaPlayer.seekTo(progress * duration / 100);
+        }
     }
 }

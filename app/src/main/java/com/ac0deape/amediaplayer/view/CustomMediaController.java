@@ -2,6 +2,7 @@ package com.ac0deape.amediaplayer.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
@@ -14,6 +15,7 @@ import com.ac0deape.amediaplayer.R;
  * Created by imlyc on 1/3/16.
  */
 public class CustomMediaController extends LinearLayout {
+    private static final String TAG = "CustomMediaController";
 
     public interface MediaEventListener {
         public void onResume();
@@ -22,6 +24,7 @@ public class CustomMediaController extends LinearLayout {
         public void onNext();
         public void onRewind();
         public void onFastForward();
+        public void onSeek(int progress);
     }
 
     private SeekBar mSeekBar;
@@ -32,7 +35,6 @@ public class CustomMediaController extends LinearLayout {
     private ImageButton mButtonFastForward;
 
     private MediaEventListener mListener = null;
-
 
     public CustomMediaController(Context context) {
         super(context);
@@ -59,6 +61,31 @@ public class CustomMediaController extends LinearLayout {
         // progress seekBar
         mSeekBar = (SeekBar) findViewById(R.id.media_controller_seekbar);
         mSeekBar.setEnabled(false);
+        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            private int mLastProgress = -1;
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    mLastProgress = progress;
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                mLastProgress = -1;
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                if (mLastProgress != -1) {
+                    if (mListener != null) {
+                        Log.d(TAG, "user seek to " + mLastProgress);
+                        mListener.onSeek(mLastProgress);
+                    }
+                }
+                mLastProgress = -1;
+            }
+        });
 
         // function controls
         mButtonPrevious = (ImageButton) findViewById(R.id.media_controller_previous);
