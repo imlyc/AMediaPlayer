@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="50dp"
+    android:layout_height="55dp"
     android:gravity="center_vertical"
     android:paddingBottom="6dp"
     android:paddingLeft="15dp"
@@ -20,14 +20,15 @@
             android:layout_gravity="center_horizontal"
             android:textAlignment="gravity"
             android:gravity="center_vertical"
-            android:text="@string/number" />
+            android:text="@string/number"
+            android:textSize="14sp"/>
 
         <TextView
             android:id="@+id/media_name"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
-            android:textSize="14sp"
+            android:textSize="15sp"
             android:textColor="@android:color/black"
             android:gravity="center_vertical"
             android:text="@string/songname" />
