@@ -4,8 +4,8 @@
     android:layout_height="50dp"
     android:gravity="center_vertical"
     android:paddingBottom="6dp"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp"
+    android:paddingLeft="15dp"
+    android:paddingRight="15dp"
     android:paddingTop="6dp"
     android:orientation="horizontal">
 
@@ -50,7 +50,8 @@
                 android:layout_height="30dp"
                 android:gravity="center_vertical"
                 android:scaleType="fitXY"
-                android:src="@android:drawable/ic_media_play" />
+                android:src="@android:drawable/ic_media_play"
+                android:layout_alignParentRight="true"/>
         </LinearLayout>
 
         <LinearLayout
@@ -63,7 +64,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:gravity="center_vertical"
-                android:text="@string/songlength" />
+                android:text="@string/songlength"
+                android:layout_alignParentRight="true"/>
         </LinearLayout>
 
         <LinearLayout
@@ -77,7 +79,8 @@
                 android:layout_height="30dp"
                 android:gravity="center_vertical"
                 android:scaleType="fitXY"
-                android:src="@android:drawable/stat_sys_download" />
+                android:src="@android:drawable/stat_sys_download"
+                android:layout_alignParentRight="true"/>
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

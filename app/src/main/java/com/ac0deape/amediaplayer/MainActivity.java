@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -28,15 +27,19 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
     private final static String TAG = "MainActivity";
+
     private final static int REQ_CODE_PICK_MUSIC = 10;
-
+    //Media Service contains Mediaplayer
     private MediaService mService = null;
-
+    //model data
     private ArrayList<MediaInfo> mMediaInfos = new ArrayList<>();
+    //listview adaptor
     private MediaListAdapter mAdapter;
+    //media control bottom tool
+    private CustomMediaController mMediaController;
 
     private Timer mTimer = null;
-    private CustomMediaController mMediaController;
+
 
     // floating action button
     private View.OnClickListener mFloatingActionButtonAction = new View.OnClickListener() {
@@ -64,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
             mService = ((MediaService.MediaBinder) service).getMediaService();
             mService.setPlaylist(mMediaInfos);
             mService.setStateListener(mPlayerStateListener);
+            //bind mediaService to adaptor
             mAdapter.setMediaService(mService);
         }
 
@@ -171,8 +175,8 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == REQ_CODE_PICK_MUSIC) {
             Uri selected = data.getData();
             Log.d(TAG, "select " + selected);
-            MediaInfo info = MediaInfo.createLocal(selected);
-            mMediaInfos.add(info);
+            //MediaInfo info = MediaInfo.createLocal(selected);
+            //mMediaInfos.add(info);
             mAdapter.notifyDataSetChanged();
         }
     }
@@ -200,12 +204,11 @@ public class MainActivity extends AppCompatActivity {
         mMediaController = findViewInContent(R.id.media_controller);
         mMediaController.setEventListener(mMediaEventListener);
 
-
+        //setup listview
         ListView mediaList = findViewInContent(R.id.media_list);
-        mMediaInfos.add(MediaInfo.createTest());
-        mMediaInfos.add(MediaInfo.createTest());
-        mMediaInfos.add(MediaInfo.createTest());
-
+        //mMediaInfos.add(MediaInfo.createTest());
+        mMediaInfos = MediaInfo.createAllMediaInfo();
+        //bind backend data with adaptor
         mAdapter = new MediaListAdapter(this, mMediaInfos);
         mediaList.setAdapter(mAdapter);
         mediaList.setOnItemClickListener(mItemClickListener);
