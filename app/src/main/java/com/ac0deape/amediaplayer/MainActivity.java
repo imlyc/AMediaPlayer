@@ -29,6 +29,7 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity {
     private final static String TAG = "MainActivity";
     private final static int REQ_CODE_PICK_MUSIC = 10;
+    private final static int PROGRESS_DELTA = 10;
 
     private MediaService mService = null;
 
@@ -98,11 +99,14 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onRewind() {
-
+            int currentProgress = mService.getProgress();
+            mService.seek(currentProgress - PROGRESS_DELTA);
         }
 
         @Override
         public void onFastForward() {
+            int currentProgress = mService.getProgress();
+            mService.seek(currentProgress + PROGRESS_DELTA);
 
         }
 

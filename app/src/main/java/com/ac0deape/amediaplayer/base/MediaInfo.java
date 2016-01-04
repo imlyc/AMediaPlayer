@@ -56,7 +56,8 @@ public class MediaInfo {
     public static MediaInfo createTest() {
         MediaInfo info = new MediaInfo();
         info.mType = Type.STREAM;
-        info.mUri = Uri.parse("http://www.stephaniequinn.com/Music/Mozart%20-%20Presto.mp3");
+        //info.mUri = Uri.parse("http://www.stephaniequinn.com/Music/Mozart%20-%20Presto.mp3");
+        info.mUri = Uri.parse("http://www.siberianhuskies.me/Back_To_December_-_Taylor_Swift.mp3");
         info.mTitle = "Test streaming unit";
         return info;
     }

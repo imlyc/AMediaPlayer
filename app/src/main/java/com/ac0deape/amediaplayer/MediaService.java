@@ -196,6 +196,12 @@ public class MediaService extends Service {
     }
 
     public void seek(int progress) {
+        if (progress > 100) {
+            progress = 100;
+        } else if (progress < 0) {
+            progress = 0;
+        }
+        
         if (mMediaPlayer != null) {
             int duration = mMediaPlayer.getDuration();
             mMediaPlayer.seekTo(progress * duration / 100);
