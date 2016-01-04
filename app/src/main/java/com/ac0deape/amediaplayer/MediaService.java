@@ -18,8 +18,6 @@ import java.util.ArrayList;
  */
 public class MediaService extends Service {
 
-
-
     public interface StateListener {
         void onPrepared();
         void onComplete();
@@ -127,7 +125,6 @@ public class MediaService extends Service {
 
         MediaInfo info = mPlaylist.get(index);
         prepareMediaPlayer(mMediaPlayer, info);
-
     }
 
     public void playNext() {
