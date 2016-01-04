@@ -70,7 +70,7 @@ public class DownloadService extends Service {
                 //cancel and remove task
                 //downloadTask.cancel(true);
                 //downloadTable.remove(uri);
-                Log.d(TAG, "media file has been downloaded.");
+                Log.d(TAG, "media file has been downloaded!");
             }
         } else {
             //start task
@@ -99,11 +99,12 @@ public class DownloadService extends Service {
         }
 
         protected void onProgressUpdate(Integer progress) {
+            Log.d(TAG, "progress = " + progress);
             setProgressPercent(progress);
         }
 
         protected void onPostExecute(Long result) {
-            Log.d(TAG, "Media file has been downloaded : " + result + " MB");
+            Log.d(TAG, "Media file has been downloaded : " + result + " kB");
         }
 
         @Override
@@ -170,12 +171,14 @@ public class DownloadService extends Service {
         }
 
         protected void setProgressPercent(final int progress) {
+            Log.d(TAG, "progress = " + progress);
             Timer timer = new Timer();
             TimerTask timerTask = new TimerTask() {
 
                 @Override
                 public void run() {
                     progressBar.setProgress(progress);
+                    Log.d(TAG, "progress = " + progress);
                 }
             };
             timer.schedule(timerTask, 0, 1000);

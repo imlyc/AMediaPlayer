@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
             View listitem_view = getViewByPosition(position, mMediaList);
             ProgressBar progressBar = (ProgressBar)listitem_view.findViewById(R.id.progressBar);
+            Log.d(TAG, "ProgressBar = " + progressBar);
             mDownloadService.queueDownload(mediaInfo.getUri(), progressBar);
         }
     };
@@ -179,6 +180,7 @@ public class MainActivity extends AppCompatActivity {
         setupView();
         setupMediaService();
 
+        //add runtime write file permission for API 23+.
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1){
             /*
             private static String[] PERMISSIONS_STORAGE = {
