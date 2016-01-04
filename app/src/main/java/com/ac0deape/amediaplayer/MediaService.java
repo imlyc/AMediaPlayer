@@ -40,6 +40,7 @@ public class MediaService extends Service {
 
     private StateListener mStateListener = null;
 
+
     private MediaPlayer.OnPreparedListener mMPPreparedListener = new MediaPlayer.OnPreparedListener() {
         @Override
         public void onPrepared(MediaPlayer mp) {
@@ -125,7 +126,6 @@ public class MediaService extends Service {
 
         MediaInfo info = mPlaylist.get(index);
         prepareMediaPlayer(mMediaPlayer, info);
-
     }
 
     public void playNext() {

@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
             mService = ((MediaService.MediaBinder) service).getMediaService();
             mService.setPlaylist(mMediaInfos);
             mService.setStateListener(mPlayerStateListener);
+            mAdapter.setMediaService(mService);
         }
 
         @Override
@@ -200,12 +201,12 @@ public class MainActivity extends AppCompatActivity {
         mMediaController.setEventListener(mMediaEventListener);
 
 
-        ListView mediaList = findViewInContent(R.id.songs_list);
+        ListView mediaList = findViewInContent(R.id.media_list);
         mMediaInfos.add(MediaInfo.createTest());
         mMediaInfos.add(MediaInfo.createTest());
         mMediaInfos.add(MediaInfo.createTest());
 
-        mAdapter = new MediaListAdapter(mMediaInfos);
+        mAdapter = new MediaListAdapter(this, mMediaInfos);
         mediaList.setAdapter(mAdapter);
         mediaList.setOnItemClickListener(mItemClickListener);
     }

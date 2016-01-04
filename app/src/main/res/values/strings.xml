@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">AMediaPlayer</string>
     <string name="action_settings">Settings</string>
+    <string name="number">1</string>
+    <string name="songname">Moments</string>
+    <string name="songlength">3:56</string>
 </resources>
