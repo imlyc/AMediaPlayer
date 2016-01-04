@@ -129,6 +129,11 @@ public class MainActivity extends AppCompatActivity {
 
     private MediaService.StateListener mPlayerStateListener = new MediaService.StateListener() {
         @Override
+        public void onInitialized(MediaInfo mediaInfo) {
+            //updateMediaControllerState(false);
+        }
+
+        @Override
         public void onPrepared() {
             updateMediaControllerState(true);
         }

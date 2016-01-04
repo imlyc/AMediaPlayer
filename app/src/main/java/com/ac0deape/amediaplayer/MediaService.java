@@ -9,6 +9,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.ac0deape.amediaplayer.base.MediaInfo;
+import com.ac0deape.amediaplayer.base.StateMediaPlayer;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 public class MediaService extends Service {
 
     public interface StateListener {
+        void onInitialized(MediaInfo mediaInfo);
         void onPrepared();
         void onComplete();
         void onStopped();
@@ -35,7 +37,7 @@ public class MediaService extends Service {
     private MediaBinder mBinder = new MediaBinder();
     private ArrayList<MediaInfo> mPlaylist = null;
 
-    private MediaPlayer mMediaPlayer = null;
+    private StateMediaPlayer mMediaPlayer = null;
     private int mCurPlayingIndex = -1;
 
     private StateListener mStateListener = null;
@@ -118,7 +120,7 @@ public class MediaService extends Service {
             mMediaPlayer.release();
         }
 
-        mMediaPlayer = new MediaPlayer();
+        mMediaPlayer = new StateMediaPlayer();
         mCurPlayingIndex = index;
 
         initMediaPlayer(mMediaPlayer);
@@ -147,6 +149,9 @@ public class MediaService extends Service {
 
         try {
             mediaPlayer.setDataSource(getApplicationContext(), info.getUri());
+            if (mStateListener != null) {
+                mStateListener.onInitialized(info);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -201,7 +206,7 @@ public class MediaService extends Service {
         } else if (progress < 0) {
             progress = 0;
         }
-        
+
         if (mMediaPlayer != null) {
             int duration = mMediaPlayer.getDuration();
             mMediaPlayer.seekTo(progress * duration / 100);
