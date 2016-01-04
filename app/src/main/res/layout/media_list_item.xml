@@ -3,35 +3,36 @@
     android:layout_width="match_parent"
     android:layout_height="55dp"
     android:gravity="center_vertical"
+    android:orientation="horizontal"
     android:paddingBottom="6dp"
     android:paddingLeft="15dp"
     android:paddingRight="15dp"
-    android:paddingTop="6dp"
-    android:orientation="horizontal">
+    android:paddingTop="6dp">
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="3">
+
         <TextView
             android:id="@+id/media_index"
             android:layout_width="30dp"
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
-            android:textAlignment="gravity"
             android:gravity="center_vertical"
             android:text="@string/number"
-            android:textSize="14sp"/>
+            android:textAlignment="gravity"
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/media_name"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
-            android:textSize="15sp"
-            android:textColor="@android:color/black"
             android:gravity="center_vertical"
-            android:text="@string/songname" />
+            android:text="@string/songname"
+            android:textColor="@android:color/black"
+            android:textSize="15sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -43,45 +44,66 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:gravity="center_vertical">
+
             <ImageButton
                 android:id="@+id/listen_btn"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
+                android:layout_alignParentRight="true"
                 android:gravity="center_vertical"
                 android:scaleType="fitXY"
-                android:src="@android:drawable/ic_media_play"
-                android:layout_alignParentRight="true"/>
+                android:src="@android:drawable/ic_media_play" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center_vertical">
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentRight="true"
+                android:indeterminate="false"
+                android:max="100"
+                android:progressDrawable="@drawable/circular_progress_bar" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:gravity="center_vertical">
+
             <TextView
                 android:id="@+id/media_length"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
+                android:layout_alignParentRight="true"
                 android:gravity="center_vertical"
-                android:text="@string/songlength"
-                android:layout_alignParentRight="true"/>
+                android:text="@string/songlength" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:gravity="center_vertical">
+
             <ImageButton
                 android:id="@+id/download_btn"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
+                android:layout_alignParentRight="true"
                 android:gravity="center_vertical"
                 android:scaleType="fitXY"
-                android:src="@android:drawable/stat_sys_download"
-                android:layout_alignParentRight="true"/>
+                android:src="@android:drawable/stat_sys_download" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

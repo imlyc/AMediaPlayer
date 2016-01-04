@@ -4,7 +4,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
@@ -16,9 +18,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.ac0deape.amediaplayer.base.MediaInfo;
 import com.ac0deape.amediaplayer.view.CustomMediaController;
+import com.ac0deape.amediaplayer.view.DownloadService;
 import com.ac0deape.amediaplayer.view.MediaListAdapter;
 
 import java.util.ArrayList;
@@ -30,10 +34,13 @@ public class MainActivity extends AppCompatActivity {
 
     private final static int REQ_CODE_PICK_MUSIC = 10;
     //Media Service contains Mediaplayer
-    private MediaService mService = null;
-    //model data
+    private MediaService mMediaService = null;
+    //Download Service
+    private DownloadService mDownloadService = new DownloadService();
+    //backend data
     private ArrayList<MediaInfo> mMediaInfos = new ArrayList<>();
-    //listview adaptor
+    //listview and adaptor
+    private ListView mMediaList;
     private MediaListAdapter mAdapter;
     //media control bottom tool
     private CustomMediaController mMediaController;
@@ -41,7 +48,28 @@ public class MainActivity extends AppCompatActivity {
     private Timer mTimer = null;
 
 
-    // floating action button
+    //implement listen btn, download btn onclick listener in listview
+    private MediaListAdapter.BtnClickListener mBtnClickListener = new MediaListAdapter.BtnClickListener(){
+
+        @Override
+        public void onListenBtnClick(int position) {
+            mMediaService.playMediaAt(position);
+            String playingMediaName = mMediaInfos.get(position).getTitle();
+            mMediaController.setPlayingMediaName(playingMediaName);
+        }
+
+        @Override
+        public void onDownloadBtnClick(int position) {
+            MediaInfo mediaInfo = mMediaInfos.get(position);
+
+            View listitem_view = getViewByPosition(position, mMediaList);
+            ProgressBar progressBar = (ProgressBar)listitem_view.findViewById(R.id.progressBar);
+            mDownloadService.queueDownload(mediaInfo.getUri(), progressBar);
+        }
+    };
+
+
+    // "+" : floating action button
     private View.OnClickListener mFloatingActionButtonAction = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -54,50 +82,51 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+
     private ServiceConnection mServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(TAG, "connect " + name + " " + service);
 
-            if (mService != null) {
-                Log.w(TAG, "service already bound " + mService);
+            if (mMediaService != null) {
+                Log.w(TAG, "service already bound " + mMediaService);
             }
 
-            mService = ((MediaService.MediaBinder) service).getMediaService();
-            mService.setPlaylist(mMediaInfos);
-            mService.setStateListener(mPlayerStateListener);
+            mMediaService = ((MediaService.MediaBinder) service).getMediaService();
+            mMediaService.setPlaylist(mMediaInfos);
+            mMediaService.setStateListener(mPlayerStateListener);
             //bind mediaService to adaptor
-            mAdapter.setMediaService(mService);
+            mAdapter.setMediaService(mMediaService);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             Log.d(TAG, "disconnect " + name);
-            mService = null;
+            mMediaService = null;
         }
     };
 
     private CustomMediaController.MediaEventListener mMediaEventListener = new CustomMediaController.MediaEventListener() {
         @Override
         public void onResume() {
-            mService.resume();
+            mMediaService.resume();
         }
 
         @Override
         public void onPause() {
-            mService.pause();
+            mMediaService.pause();
 
         }
 
         @Override
         public void onPrevious() {
-            mService.playPrevious();
+            mMediaService.playPrevious();
         }
 
         @Override
         public void onNext() {
-            mService.playNext();
+            mMediaService.playNext();
         }
 
         @Override
@@ -111,12 +140,13 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    //listview onItemClickListener
     private ListView.OnItemClickListener mItemClickListener = new ListView.OnItemClickListener() {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Log.d(TAG, "onItemClick at " + position);
-            mService.playMediaAt(position);
+            Log.d(TAG, "onItemClick at: " + position);
+            mMediaService.playMediaAt(position);
         }
     };
 
@@ -148,6 +178,26 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setupView();
         setupMediaService();
+
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1){
+            /*
+            private static String[] PERMISSIONS_STORAGE = {
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+            };*/
+            String[] perms = {"android.permission.WRITE_EXTERNAL_STORAGE"};
+            int permsRequestCode = 200;
+            requestPermissions(perms, permsRequestCode);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int permsRequestCode, String[] permissions, int[] grantResults){
+        switch(permsRequestCode){
+            case 200:
+                boolean writeAccepted = grantResults[0]== PackageManager.PERMISSION_GRANTED;
+                break;
+        }
     }
 
     @Override
@@ -188,8 +238,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void cleanMediaService() {
-        if (mService != null) {
-            mService.setStateListener(null);
+        if (mMediaService != null) {
+            mMediaService.setStateListener(null);
             unbindService(mServiceConnection);
         }
     }
@@ -205,13 +255,13 @@ public class MainActivity extends AppCompatActivity {
         mMediaController.setEventListener(mMediaEventListener);
 
         //setup listview
-        ListView mediaList = findViewInContent(R.id.media_list);
+        mMediaList = findViewInContent(R.id.media_list);
         //mMediaInfos.add(MediaInfo.createTest());
         mMediaInfos = MediaInfo.createAllMediaInfo();
         //bind backend data with adaptor
-        mAdapter = new MediaListAdapter(this, mMediaInfos);
-        mediaList.setAdapter(mAdapter);
-        mediaList.setOnItemClickListener(mItemClickListener);
+        mAdapter = new MediaListAdapter(this, mMediaInfos, mBtnClickListener);
+        mMediaList.setAdapter(mAdapter);
+        mMediaList.setOnItemClickListener(mItemClickListener);
     }
 
     @Override
@@ -242,6 +292,18 @@ public class MainActivity extends AppCompatActivity {
         return v;
     }
 
+    public View getViewByPosition(int pos, ListView listView) {
+        final int firstListItemPosition = listView.getFirstVisiblePosition();
+        final int lastListItemPosition = firstListItemPosition + listView.getChildCount() - 1;
+
+        if (pos < firstListItemPosition || pos > lastListItemPosition ) {
+            return listView.getAdapter().getView(pos, null, listView);
+        } else {
+            final int childIndex = pos - firstListItemPosition;
+            return listView.getChildAt(childIndex);
+        }
+    }
+
     private void updateMediaControllerState(boolean isPlaying) {
         mMediaController.updateButtonState(isPlaying);
         if (isPlaying) {
@@ -260,7 +322,7 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        int progress = mService.getProgress();
+                        int progress = mMediaService.getProgress();
                         mMediaController.updateSeekBar(progress);
                         //Log.d(TAG, "progress " + progress);
                     }

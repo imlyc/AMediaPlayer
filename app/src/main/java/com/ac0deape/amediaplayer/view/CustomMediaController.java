@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.ac0deape.amediaplayer.R;
 
@@ -50,6 +51,11 @@ public class CustomMediaController extends LinearLayout {
 
     public void setEventListener(MediaEventListener listener) {
         mListener = listener;
+    }
+
+    public void setPlayingMediaName(String name){
+        TextView playingMediaName_txtView = (TextView)findViewById(R.id.playingmedianame);
+        playingMediaName_txtView.setText(name);
     }
 
     private void initLayout(Context context) {

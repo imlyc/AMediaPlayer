@@ -117,7 +117,7 @@ public class MediaInfo {
     }
 
     public String getDuration(){
-        return "3:56";
+        return mDuration;
     }
 
     public Type getType() {
