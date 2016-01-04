@@ -4,11 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
+    android:paddingBottom="0dp"
+    android:paddingLeft="0dp"
+    android:paddingRight="0dp"
+    android:paddingTop="0dp"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.ac0deape.amediaplayer.MainActivity"
     tools:showIn="@layout/activity_main">
@@ -18,18 +18,44 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2"
+        android:background="@color/gender_female"
         android:elevation="@dimen/view_elevation"
-        android:orientation="horizontal"
-        android:background="@color/dark_black">
+        android:orientation="horizontal">
 
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/media_list_header"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/light_background"
+        android:orientation="vertical"
+        android:paddingLeft="15dp">
+
+        <!--playlist playing mode-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:gravity="center_vertical"
+            android:text="@string/playlistmode"
+            android:textColor="@android:color/black"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <!--separator-->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/gray_line_color"/>
 
     <ListView
         android:id="@+id/media_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="4"
-        android:background="@color/dark_red">
+        android:background="@color/light_background">
+
     </ListView>
 
     <com.ac0deape.amediaplayer.view.CustomMediaController
@@ -37,8 +63,9 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:background="@color/light_yellow"
         android:elevation="@dimen/view_elevation"
-        android:orientation="vertical"
-        android:background="@color/pink">
+        android:orientation="vertical">
+
     </com.ac0deape.amediaplayer.view.CustomMediaController>
 </LinearLayout>

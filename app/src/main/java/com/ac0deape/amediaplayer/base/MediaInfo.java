@@ -12,18 +12,40 @@ public class MediaInfo {
 
     private Type mType;
     private Uri mUri;
-
     private String mTitle;
 
     private MediaInfo() {
 
     }
 
+    public MediaInfo(Type type, Uri uri) {
+        this.mType = type;
+        this.mUri = uri;
+        this.mTitle = uri.getPath();
+    }
+
     public static MediaInfo createLocal(Uri uri) {
         MediaInfo info = new MediaInfo();
         info.mType = Type.LOCAL;
         info.mUri = uri;
+        info.mTitle = uri.getPath();
 
+        return info;
+    }
+
+    public static MediaInfo createStream(Uri uri) {
+        MediaInfo info = new MediaInfo();
+        info.mType = Type.STREAM;
+        info.mUri = uri;
+        info.mTitle = uri.getPath();
+
+        return info;
+    }
+
+    public static MediaInfo createDownload(Uri uri) {
+        MediaInfo info = new MediaInfo();
+        info.mType = Type.DOWNLOAD;
+        info.mUri = uri;
         info.mTitle = uri.getPath();
 
         return info;
@@ -33,8 +55,7 @@ public class MediaInfo {
         MediaInfo info = new MediaInfo();
         info.mType = Type.STREAM;
         info.mUri = Uri.parse("http://www.stephaniequinn.com/Music/Mozart%20-%20Presto.mp3");
-
-        info.mTitle = "Test streaming content";
+        info.mTitle = "Test streaming unit";
         return info;
     }
 

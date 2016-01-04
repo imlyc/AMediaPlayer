@@ -30,6 +30,7 @@ public class MediaListAdapter extends ArrayAdapter {
         this.mMediaInfos = infos;
     }
 
+    //bind media service to adaptor
     public void setMediaService(MediaService mediaService){
         this.mMediaService = mediaService;
     }
@@ -76,7 +77,7 @@ public class MediaListAdapter extends ArrayAdapter {
 
             @Override
             public void onClick(View v) {
-                Log.d(TAG, "onItemClick at " + position);
+                Log.d(TAG, "Listen button: onClick at " + position);
                 mMediaService.playMediaAt(position);
             }
         });
@@ -85,6 +86,7 @@ public class MediaListAdapter extends ArrayAdapter {
 
             @Override
             public void onClick(View v) {
+                Log.d(TAG, "Download button: onClick at " + position);
 
             }
         });
