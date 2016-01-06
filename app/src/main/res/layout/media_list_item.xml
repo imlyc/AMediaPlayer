@@ -38,19 +38,20 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="2"
+        android:layout_weight="2.5"
         android:gravity="center_vertical">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical|right"
+            android:layout_alignParentRight="true">
 
             <ImageButton
                 android:id="@+id/listen_btn"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_alignParentRight="true"
                 android:gravity="center_vertical"
                 android:scaleType="fitXY"
@@ -62,7 +63,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical|right">
 
             <ProgressBar
                 android:id="@+id/progressBar"
@@ -79,7 +80,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical|center_horizontal">
 
             <TextView
                 android:id="@+id/media_length"
@@ -94,12 +95,12 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical|right">
 
             <ImageButton
                 android:id="@+id/download_btn"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_alignParentRight="true"
                 android:gravity="center_vertical"
                 android:scaleType="fitXY"

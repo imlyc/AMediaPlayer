@@ -21,8 +21,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Hashtable;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created by xiangyixie on 1/4/16.
@@ -95,17 +93,21 @@ public class DownloadService extends Service {
 
         @Override
         protected void onPreExecute() {
-            super.onPreExecute();
             Log.d(TAG, "Start downloading a media file....");
+            super.onPreExecute();
         }
 
-        protected void onProgressUpdate(Integer progress) {
-            Log.d(TAG, "progress = " + progress);
-            setProgressPercent(progress);
+        @Override
+        protected void onProgressUpdate(Integer... progress) {
+           // Log.d(TAG, "progress = " + progress[0]);
+            setProgressPercent(progress[0]);
+            super.onProgressUpdate(progress);
         }
 
+        @Override
         protected void onPostExecute(Long result) {
             Log.d(TAG, "A media file has been downloaded : " + result + " kB");
+            super.onPostExecute(result);
         }
 
         @Override
@@ -113,15 +115,15 @@ public class DownloadService extends Service {
             Uri uri = uris[0];
             Log.d(TAG, "scheme = " + uri.getScheme() + ", host = " + uri.getHost() + ", path = " + uri.getPath());
             Log.d(TAG, "uri = " + uri.toString());
-            String uri_str = uri.toString();
+            String uriStr = uri.toString();
             //test String url_str = "http://www.siberianhuskies.me/Back_To_December_-_Taylor_Swift.mp3";
             URL url = null;
-            String file_name = null;
+            String fileName = null;
             File outputFile = null;
             long length = 0;
 
             try {
-                url = new URL(uri_str);
+                url = new URL(uriStr);
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
             } catch (MalformedURLException e) {
@@ -134,26 +136,56 @@ public class DownloadService extends Service {
                 c.setRequestMethod("GET");
                 //c.setDoOutput(true);
                 c.connect();
+                // expect HTTP 200 OK, so we don't mistakenly save error report instead of the file
+                if (c.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                    Log.d(TAG, "Server returned HTTP " + c.getResponseCode()
+                            + " " + c.getResponseMessage());
+                    return length;
+                }
+                // this will be useful to display download percentage might be -1: server did not report the length
+                Integer readFileLength = c.getContentLength();
                 InputStream in = c.getInputStream();
-                // target download store file directory
+
+                // target store file directory
                 String PATH = Environment.getExternalStorageDirectory()
-                        + "/download/";
+                        + "/download/media/";
                 Log.d(TAG, "download PATH: " + PATH);
                 File file = new File(PATH);
                 if (!file.exists()) {
                     file.mkdirs();
                 }
                 // create new output file
-                file_name = uri_str.substring(uri_str.lastIndexOf('/') + 1);
-                outputFile = new File(file, file_name);
+                fileName = uriStr.substring(uriStr.lastIndexOf('/') + 1);
+                outputFile = new File(file, fileName);
                 FileOutputStream fos = new FileOutputStream(outputFile);
                 // read and write
                 byte[] buffer = new byte[1024];
-                int len1 = 0;
+                int size = 0, total = 0;
+                Long lastTime = System.currentTimeMillis();
 
-                while ((len1 = in.read(buffer)) != -1 && !isCancelled()) {
-                    fos.write(buffer, 0, len1);
+                while ((size = in.read(buffer)) != -1) {
+                    Log.d(TAG, "read buffer size = " + size);
+                    // back button : cancel download
+                    if (isCancelled()) {
+                        in.close();
+                        return null;
+                    }
+                    fos.write(buffer, 0, size);
+                    total += size;
+
+                    if(readFileLength > 0){
+                        Long nowTime = System.currentTimeMillis();
+                        Long diff = nowTime - lastTime;
+                        if(diff > 100){
+                            lastTime = nowTime;
+                            int progress = (int) (total * 100 / readFileLength);
+                            //update progressBar on UI thread
+                            publishProgress(progress);
+                        }
+                    }
                 }
+                //complete download file
+                publishProgress(100);
                 if (in != null) {
                     in.close();
                 }
@@ -176,16 +208,7 @@ public class DownloadService extends Service {
 
         protected void setProgressPercent(final int progress) {
             Log.d(TAG, "progress = " + progress);
-            Timer timer = new Timer();
-            TimerTask timerTask = new TimerTask() {
-
-                @Override
-                public void run() {
-                    progressBar.setProgress(progress);
-                    Log.d(TAG, "progress = " + progress);
-                }
-            };
-            timer.schedule(timerTask, 0, 1000);
+            progressBar.setProgress(progress);
         }
     }
 
@@ -196,7 +219,7 @@ public class DownloadService extends Service {
         //broadcastManager = LocalBroadcastManager.getInstance(this);
     }
 
-    //execute DownloadFileTask (AsyncTask)
+    //execute DownloadFileTask (AsyncTask) on thread_pool_executor
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     void startDownloadFileTask(DownloadFileTask task) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
