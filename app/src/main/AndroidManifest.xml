@@ -25,7 +25,6 @@
         </activity>
 
         <service android:name=".MediaService" />
-        <service android:name=".view.DownloadService"/>
     </application>
 
 </manifest>

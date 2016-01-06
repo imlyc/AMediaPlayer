@@ -1,4 +1,4 @@
-package com.ac0deape.amediaplayer.view;
+package com.ac0deape.amediaplayer;
 
 import android.annotation.TargetApi;
 import android.app.Service;
@@ -70,7 +70,7 @@ public class DownloadService extends Service {
                 //cancel and remove task
                 //downloadTask.cancel(true);
                 //downloadTable.remove(uri);
-                Log.d(TAG, "media file has been downloaded!");
+                Log.d(TAG, "A media file has been downloaded !");
             }
         } else {
             //start task
@@ -96,6 +96,7 @@ public class DownloadService extends Service {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            Log.d(TAG, "Start downloading a media file....");
         }
 
         protected void onProgressUpdate(Integer progress) {
@@ -104,20 +105,23 @@ public class DownloadService extends Service {
         }
 
         protected void onPostExecute(Long result) {
-            Log.d(TAG, "Media file has been downloaded : " + result + " kB");
+            Log.d(TAG, "A media file has been downloaded : " + result + " kB");
         }
 
         @Override
-        protected Long doInBackground(Uri... uri) {
-            String url_str = "http://www.siberianhuskies.me/Back_To_December_-_Taylor_Swift.mp3";
-            Log.d(TAG, "url str = " + url_str);
+        protected Long doInBackground(Uri... uris) {
+            Uri uri = uris[0];
+            Log.d(TAG, "scheme = " + uri.getScheme() + ", host = " + uri.getHost() + ", path = " + uri.getPath());
+            Log.d(TAG, "uri = " + uri.toString());
+            String uri_str = uri.toString();
+            //test String url_str = "http://www.siberianhuskies.me/Back_To_December_-_Taylor_Swift.mp3";
             URL url = null;
             String file_name = null;
             File outputFile = null;
             long length = 0;
 
             try {
-                url = new URL(url_str);
+                url = new URL(uri_str);
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
             } catch (MalformedURLException e) {
@@ -128,10 +132,10 @@ public class DownloadService extends Service {
                 Log.d(TAG, "url = " + url);
                 HttpURLConnection c = (HttpURLConnection) url.openConnection();
                 c.setRequestMethod("GET");
-                c.setDoOutput(true);
+                //c.setDoOutput(true);
                 c.connect();
                 InputStream in = c.getInputStream();
-                // target download file store directory
+                // target download store file directory
                 String PATH = Environment.getExternalStorageDirectory()
                         + "/download/";
                 Log.d(TAG, "download PATH: " + PATH);
@@ -140,7 +144,7 @@ public class DownloadService extends Service {
                     file.mkdirs();
                 }
                 // create new output file
-                file_name = url_str.substring(url_str.lastIndexOf('/') + 1);
+                file_name = uri_str.substring(uri_str.lastIndexOf('/') + 1);
                 outputFile = new File(file, file_name);
                 FileOutputStream fos = new FileOutputStream(outputFile);
                 // read and write
@@ -165,7 +169,7 @@ public class DownloadService extends Service {
             // read downloaded file size in KB
             length = outputFile.length();
             length = length / 1024;
-            Log.i(TAG, "Check Your File.");
+            Log.i(TAG, "Check your downloaded file.");
 
             return length;
         }
@@ -192,11 +196,11 @@ public class DownloadService extends Service {
         //broadcastManager = LocalBroadcastManager.getInstance(this);
     }
 
-
+    //execute DownloadFileTask (AsyncTask)
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     void startDownloadFileTask(DownloadFileTask task) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, task.getUri());
         else {
             task.execute(task.getUri());
         }

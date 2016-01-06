@@ -22,7 +22,6 @@ import android.widget.ProgressBar;
 
 import com.ac0deape.amediaplayer.base.MediaInfo;
 import com.ac0deape.amediaplayer.view.CustomMediaController;
-import com.ac0deape.amediaplayer.view.DownloadService;
 import com.ac0deape.amediaplayer.view.MediaListAdapter;
 
 import java.util.ArrayList;
