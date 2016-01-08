@@ -34,6 +34,7 @@ public class MediaService extends Service {
     }
 
     private final static String TAG = "MediaService";
+
     private MediaBinder mBinder = new MediaBinder();
     private ArrayList<MediaInfo> mPlaylist = null;
 
@@ -109,7 +110,7 @@ public class MediaService extends Service {
     }
 
     public void playMediaAt(int index) {
-        Log.d(TAG, "playMediaAt " + index);
+        Log.d(TAG, "playMediaAt pos " + index);
         if (mMediaPlayer != null) {
             if (mMediaPlayer.isPlaying()) {
                 mMediaPlayer.stop();
@@ -176,7 +177,10 @@ public class MediaService extends Service {
             int duration = mMediaPlayer.getDuration();
             int current = mMediaPlayer.getCurrentPosition();
             Log.d(TAG, "duration " + duration + ", current " + current);
-            return current * 100 / duration;
+            if(duration!=0){
+                return current * 100 / duration;
+            }
+            return 0;
         }
     }
 
