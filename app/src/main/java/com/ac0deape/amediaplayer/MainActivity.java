@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     //Media Service contains Mediaplayer
     private MediaService mMediaService = null;
     //Download Service
-    private DownloadService mDownloadService = new DownloadService();
+    private Download mDownload = new Download();
     //backend data
     private ArrayList<MediaInfo> mMediaInfos = new ArrayList<>();
     //listview and adaptor
@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
             View listitem_view = getViewByPosition(position, mMediaList);
             ProgressBar progressBar = (ProgressBar)listitem_view.findViewById(R.id.progressBar);
             Log.d(TAG, "ProgressBar = " + progressBar);
-            mDownloadService.queueDownload(mediaInfo.getUri(), progressBar);
+            mDownload.queueDownload(mediaInfo.getUri(), progressBar);
         }
     };
 

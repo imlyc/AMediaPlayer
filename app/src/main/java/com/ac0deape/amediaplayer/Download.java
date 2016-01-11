@@ -1,14 +1,10 @@
 package com.ac0deape.amediaplayer;
 
 import android.annotation.TargetApi;
-import android.app.Service;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Environment;
-import android.os.IBinder;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.ProgressBar;
 
@@ -27,8 +23,8 @@ import java.util.Hashtable;
  */
 
 
-public class DownloadService extends Service {
-    private String TAG = "DownloadService";
+public class Download{
+    private String TAG = "Download";
 
     private static final long INTERVAL_BROADCAST = 800;
     //private long mLastUpdate = 0;
@@ -36,24 +32,10 @@ public class DownloadService extends Service {
     private Hashtable<Uri, DownloadFileTask> downloadTable;
     //private LocalBroadcastManager broadcastManager;
 
-    public DownloadService() {
+    public Download() {
         downloadTable = new Hashtable<>();
     }
 
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Uri uri = (Uri) intent.getSerializableExtra("MediaUri");
-        ProgressBar progressBar = (ProgressBar) intent.getSerializableExtra("ProgressBar");
-        queueDownload(uri, progressBar);
-        return super.onStartCommand(intent, flags, startId);
-    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
 
     public void queueDownload(Uri uri, ProgressBar progressBar) {
         if (downloadTable.containsKey(uri)) {
@@ -99,7 +81,7 @@ public class DownloadService extends Service {
 
         @Override
         protected void onProgressUpdate(Integer... progress) {
-           // Log.d(TAG, "progress = " + progress[0]);
+            // Log.d(TAG, "progress = " + progress[0]);
             setProgressPercent(progress[0]);
             super.onProgressUpdate(progress);
         }
@@ -210,13 +192,6 @@ public class DownloadService extends Service {
             Log.d(TAG, "progress = " + progress);
             progressBar.setProgress(progress);
         }
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        downloadTable = new Hashtable<Uri, DownloadFileTask>();
-        //broadcastManager = LocalBroadcastManager.getInstance(this);
     }
 
     //execute DownloadFileTask (AsyncTask) on thread_pool_executor
